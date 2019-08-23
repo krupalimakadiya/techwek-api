@@ -1,2 +1,2 @@
 # techwek-api
-Node js REST API
+Node js REST API using MongoDB
