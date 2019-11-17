@@ -1,11 +1,9 @@
-'use strict';
+const express = require('express');
 
-var express = require('express');
+const blogRoutes = require('./BlogRoutes');
 
-var blogRoutes = require('./BlogRoutes');
-var router = express.Router();
+const router = express.Router();
 
-//test Route
 router.use('/blog', blogRoutes);
 
 module.exports = router;

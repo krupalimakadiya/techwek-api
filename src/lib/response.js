@@ -1,56 +1,43 @@
-'use strict';
-/**
- * This file modifies the request-response of the app.
- * What should do before request execute and what should do after request execution complete.
- */
-var debug = require('debug')('API:RequestResponse');
-var Boom = require('boom');
-var _ = require('lodash');
-var Utils = require('./utils/Utils');
+/* eslint-disable guard-for-in , no-restricted-syntax */
+const debug = require('debug')('API:RequestResponse');
+const _ = require('lodash');
 
-exports.trimParams = function (req, res, next) {
-  //console.log('req', req)
-  //debug('API : %o', Utils.url(req) + req.url);
-//  debug('req.method : %o ', req);
-
-  // Trinm query and post parameters
-  if (req.query) {
-    for (var i in req.query) {
-      if (_.isString(req.query[i])) {
+exports.trimParams = (req, res, next) => {
+  //  debug('req.method : %o ', req)
+  // Trim query and post parameters
+  if (req.query || req.body) {
+    for (const i in req.query || req.body) {
+      if (req.query[i]) {
         req.query[i] = req.query[i].trim();
       }
-    }
-  }
-
-  if (req.body) {
-    for (i in req.body) {
-      if (_.isString(req.body[i])) {
+      if (req.body[i]) {
         req.body[i] = req.body[i].trim();
       }
     }
   }
-  //debug('req.body : %o ', req.body);  
-  //debug('req.query : %o ', req.query);
-  //debug('req.params: %o', req.params);
+
+  // debug('req.body : %o ', req.body);
+  // debug('req.query : %o ', req.query);
+  // debug('req.params: %o', req.params);
   next();
 };
 
-exports.handleSuccess = function (req, res, next) {
-  var response = req.session.data || [];
-  req.session.destroy();  
+exports.handleSuccess = (req, res) => {
+  const response = req.session.data || [];
+  req.session.destroy();
   debug('Success response : %o ', response);
   return res.send(response);
 };
 
-exports.handleError = function (err, req, res, next) {
+exports.handleError = (err, req, res, next) => {
   if (!err) {
     return next();
   }
-  var errorResponse = {
+  const errorResponse = {
     error: _.merge({
-      stack: err.stack
-    }, err.output && err.output.payload ? err.output.payload : err)
-  };  
+      stack: err.stack,
+    }, err.output && err.output.payload ? err.output.payload : err),
+  };
   debug('error response : %o ', errorResponse);
   return res.status(err.output && err.output.statusCode ? err.output.statusCode : 500).json(errorResponse);
 };
